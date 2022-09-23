@@ -1,0 +1,10 @@
+# for other component that not relevant to terraform running
+other
+
+# for privat terraform environment
+terraform.tfvars
+
+# for terraform tfstate and lock
+.terraform.lock.hcl
+terraform.tfstate
+.terraform
