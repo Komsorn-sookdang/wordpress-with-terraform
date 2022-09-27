@@ -21,12 +21,24 @@ resource "aws_subnet" "subnet-1" {
     }
 }
 
+resource "aws_instance" "db-server" {
+    ami = "ami-00e912d13fbb4f225"
+    instance_type = "t2.micro"
+    key_name = "mid-project-key"
+
+    user_data = "${file("db-server-init.sh")}"
+    
+    tags = {
+        Name = "mid-project-db-server"
+    }
+}
+
 resource "aws_instance" "app-server" {
     ami = "ami-00e912d13fbb4f225"
     instance_type = "t2.micro"
     key_name = "mid-project-key"
 
-    user_data = "${file("app-init.sh")}"
+    user_data = "${file("app-server-init.sh")}"
 
     tags = {
         Name = "mid-project-app-server"
