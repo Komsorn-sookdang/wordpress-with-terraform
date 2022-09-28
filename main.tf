@@ -21,15 +21,34 @@ resource "aws_subnet" "subnet-1" {
     }
 }
 
+data "template_file" "db-server-init" {
+    template = file("./db-server-init.tpl")
+    vars = {
+        db_username      = var.database_user
+        db_user_password = var.database_password
+        db_name          = var.database_name
+    }
+}
+
 resource "aws_instance" "db-server" {
     ami = "ami-00e912d13fbb4f225"
     instance_type = "t2.micro"
     key_name = "mid-project-key"
 
-    user_data = "${file("db-server-init.sh")}"
+    user_data = data.template_file.db-server-init.rendered
     
     tags = {
         Name = "mid-project-db-server"
+    }
+}
+
+data "template_file" "app-server-init" {
+    template = file("./app-server-init.tpl")
+    vars = {
+        db_username      = var.database_user
+        db_user_password = var.database_password
+        db_name          = var.database_name
+        db_endpoint      = aws_instance.db-server.public_ip
     }
 }
 
@@ -38,7 +57,7 @@ resource "aws_instance" "app-server" {
     instance_type = "t2.micro"
     key_name = "mid-project-key"
 
-    user_data = "${file("app-server-init.sh")}"
+    user_data = data.template_file.app-server-init.rendered
 
     tags = {
         Name = "mid-project-app-server"
