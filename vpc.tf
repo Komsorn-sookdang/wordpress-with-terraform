@@ -6,7 +6,7 @@ provider "aws" {
 }
 
 resource "aws_vpc" "mid-project" {
-    cidr_block = "172.16.0.0/16"
+    cidr_block = var.vpc_subnet
 
     tags = {
         Name = "mid-project-vpc"

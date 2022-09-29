@@ -4,6 +4,7 @@ data "template_file" "db-server-init" {
         db_username      = var.database_user
         db_user_password = var.database_password
         db_name          = var.database_name
+        app_ip           = aws_network_interface.private-app-internal-interface.private_ip
     }
 }
 
@@ -74,4 +75,8 @@ output "app-internal-ip" {
 
 output "app-public-ip" {
     value = aws_instance.app-server.public_ip
+}
+
+output "nat-ip" {
+    value = aws_nat_gateway.nat-gateway.public_ip
 }
