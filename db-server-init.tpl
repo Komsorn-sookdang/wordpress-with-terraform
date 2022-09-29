@@ -15,7 +15,7 @@ apt install mariadb-server mariadb-client -y
 
 echo 'create && set up database' >> /home/ubuntu/terraform-log.txt
 # sudo mysql -u root --password=  
-mysql -u root -e "CREATE DATABASE wordpress_db"
+mysql -u root -e "CREATE DATABASE $db_name"
 mysql -u root -e "CREATE USER '$db_username'@'%' IDENTIFIED BY '$db_user_password'"
 mysql -u root -e "GRANT ALL ON $db_name.* TO '$db_username'@'%' IDENTIFIED BY '$db_user_password'"
 mysql -u root -e "FLUSH PRIVILEGES"

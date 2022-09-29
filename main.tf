@@ -1,26 +1,3 @@
-provider "aws" {
-    # version = "-> 2.0"
-    region = "ap-southeast-1"
-    access_key = var.AWS_ACCESS_KEY
-    secret_key = var.AWS_SECRET_KEY
-}
-
-resource "aws_vpc" "mid-project" {
-    cidr_block = "172.16.0.0/16"
-
-    tags = {
-        Name = "mid-project-vpc"
-    }
-}
-
-resource "aws_subnet" "subnet-1" {
-    vpc_id = "${aws_vpc.mid-project.id}"
-    cidr_block = "172.16.1.0/24"
-    tags = {
-        Name = "subnet-1"
-    }
-}
-
 data "template_file" "db-server-init" {
     template = file("./db-server-init.tpl")
     vars = {
@@ -37,6 +14,16 @@ resource "aws_instance" "db-server" {
 
     user_data = data.template_file.db-server-init.rendered
     
+    network_interface {
+        network_interface_id = aws_network_interface.private-db-internal-interface.id
+        device_index = 1
+    }
+
+    network_interface {
+        network_interface_id = aws_network_interface.private-db-interface.id
+        device_index = 0
+    }
+
     tags = {
         Name = "mid-project-db-server"
     }
@@ -48,7 +35,7 @@ data "template_file" "app-server-init" {
         db_username      = var.database_user
         db_user_password = var.database_password
         db_name          = var.database_name
-        db_endpoint      = aws_instance.db-server.public_ip
+        db_endpoint      = aws_network_interface.private-db-internal-interface.private_ip
     }
 }
 
@@ -59,7 +46,32 @@ resource "aws_instance" "app-server" {
 
     user_data = data.template_file.app-server-init.rendered
 
+    network_interface {
+        network_interface_id = aws_network_interface.public-app-interface.id
+        device_index = 0
+    }
+
+    network_interface {
+        network_interface_id = aws_network_interface.private-app-internal-interface.id
+        device_index = 1
+    }
     tags = {
         Name = "mid-project-app-server"
     }
+}
+
+output "db-internal-ip" {
+    value = aws_network_interface.private-db-internal-interface.private_ip
+}
+
+output "db-to-nat-ip" {
+    value = aws_instance.db-server.private_ip
+}
+
+output "app-internal-ip" {
+    value = aws_network_interface.private-app-internal-interface.private_ip
+}
+
+output "app-public-ip" {
+    value = aws_instance.app-server.public_ip
 }
