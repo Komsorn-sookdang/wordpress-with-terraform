@@ -1,0 +1,24 @@
+region            = "ap-southeast-1"
+availability_zone = "ap-southeast-1a"
+ami               = "ami-00e912d13fbb4f225"
+bucket_name       = "your-bucket-name"
+database_name     = "wordpress"
+database_user     = "user"
+database_pass     = "user"
+admin_user        = "admin"
+admin_pass        = "admin"
+
+
+
+
+AWS_ACCESS_KEY = "your-access-key"
+AWS_SECRET_KEY = "your-secret-key"
+AWS_SECRET_REGION = "ap-southeast-1"
+
+vpc_subnet = "172.16.0.0/16"
+public_app_subnet = "172.16.1.0/24"
+public_nat_subnet = "172.16.2.0/24"
+private_db_subnet = "172.16.3.0/24"
+private_internal_subnet = "172.16.4.0/24"
+
+admin_email = "admin@example.com"

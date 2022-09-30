@@ -2,14 +2,14 @@ data "template_file" "db-server-init" {
     template = file("./db-server-init.tpl")
     vars = {
         db_username      = var.database_user
-        db_user_password = var.database_password
+        db_user_password = var.database_pass
         db_name          = var.database_name
         app_ip           = aws_network_interface.private-app-internal-interface.private_ip
     }
 }
 
 resource "aws_instance" "db-server" {
-    ami = "ami-00e912d13fbb4f225"
+    ami = var.ami
     instance_type = "t2.micro"
     key_name = "mid-project-key"
 
@@ -33,15 +33,25 @@ resource "aws_instance" "db-server" {
 data "template_file" "app-server-init" {
     template = file("./app-server-init.tpl")
     vars = {
-        db_username      = var.database_user
-        db_user_password = var.database_password
-        db_name          = var.database_name
-        db_endpoint      = aws_network_interface.private-db-internal-interface.private_ip
+        app_elastic_ip      = aws_eip.app-eip.public_ip
+        db_username         = var.database_user
+        db_user_password    = var.database_pass
+        db_name             = var.database_name
+        db_endpoint         = aws_network_interface.private-db-internal-interface.private_ip
+        admin_user          = var.admin_user
+        admin_pass          = var.admin_pass
+        admin_email         = var.admin_email
+        bucket_name         = var.bucket_name
+        iam_user_access_key = aws_iam_access_key.s3_key.id
+        iam_user_secret_key = aws_iam_access_key.s3_key.secret
     }
 }
 
 resource "aws_instance" "app-server" {
-    ami = "ami-00e912d13fbb4f225"
+    depends_on = [
+        aws_instance.db-server
+    ]
+    ami = var.ami
     instance_type = "t2.micro"
     key_name = "mid-project-key"
 
@@ -74,9 +84,14 @@ output "app-internal-ip" {
 }
 
 output "app-public-ip" {
-    value = aws_instance.app-server.public_ip
+    value = aws_eip.app-eip.public_ip
 }
 
 output "nat-ip" {
     value = aws_nat_gateway.nat-gateway.public_ip
+}
+
+output "iam-user-key" {
+    value = aws_iam_access_key.s3_key.id
+    # value = [aws_iam_access_key.s3_key.id, aws_iam_access_key.s3_key.secret]
 }

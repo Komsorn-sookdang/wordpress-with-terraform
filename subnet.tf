@@ -2,7 +2,7 @@
 resource "aws_subnet" "public-app-subnet" {
     vpc_id = aws_vpc.mid-project.id
     cidr_block = var.public_app_subnet
-    availability_zone = "ap-southeast-1a"
+    availability_zone = var.availability_zone
     map_public_ip_on_launch = "true"
 
     tags = {
@@ -14,7 +14,7 @@ resource "aws_subnet" "public-app-subnet" {
 resource "aws_subnet" "public-nat-subnet" {
     vpc_id = aws_vpc.mid-project.id
     cidr_block = var.public_nat_subnet
-    availability_zone = "ap-southeast-1a"
+    availability_zone = var.availability_zone
     map_public_ip_on_launch = "true"
 
     tags = {
@@ -26,7 +26,7 @@ resource "aws_subnet" "public-nat-subnet" {
 resource "aws_subnet" "private-db-subnet" {
     vpc_id = aws_vpc.mid-project.id
     cidr_block = var.private_db_subnet
-    availability_zone = "ap-southeast-1a"
+    availability_zone = var.availability_zone
     map_public_ip_on_launch = "false"
 
     tags = {
@@ -38,7 +38,7 @@ resource "aws_subnet" "private-db-subnet" {
 resource "aws_subnet" "private-internal-subnet" {
     vpc_id = aws_vpc.mid-project.id
     cidr_block = var.private_internal_subnet
-    availability_zone = "ap-southeast-1a"
+    availability_zone = var.availability_zone
     map_public_ip_on_launch = "false"
 
     tags = {
